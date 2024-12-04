@@ -33,3 +33,4 @@ from . import stations
 from . import profile
 from . import orders
 from . import subscription
+from . import landing_forms

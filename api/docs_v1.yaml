@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: WISH - API v1
   description: |-
-    [WISH](https://shareu.ru/) documentation (mainly for mobile applications)
+    Документация [WISH](https://shareu.ru/)
     
 
   #termsOfService: http://swagger.io/terms/
@@ -17,22 +17,24 @@ servers:
   - url: https://api.shareu.ru/test/v1
 tags:
   - name: auth
-    description: User authorization
+    description: Авторизация пользователя
   - name: stations
-    description: Stations
+    description: Станции
   - name: orders
-    description: Actions with orders
+    description: Действия с заказами
   - name: profile
-    description: User information
+    description: Информация о пользователе
   - name: subscription
-    description: Subscription
+    description: Подписка
+  - name: landing-forms
+    description: Формы без авторизации
 paths:
   /auth/start-phone-verification:
     post:
       tags:
         - auth
-      summary: Start phone verification
-      description: Init flash-call for phone verification
+      summary: Начать проверку телефона
+      description: Инициализировать flash-звонок для проверки телефона
       operationId: authStartPhoneVerification
       requestBody:
         # description: Init flash-call for phone verification
@@ -43,7 +45,7 @@ paths:
         required: true
       responses:
         '200':
-          description: The flash-call to user has been ordered
+          description: Flash-звонок пользователю был начат
           content:
             application/json:
               schema:
@@ -53,8 +55,8 @@ paths:
     post:
       tags:
         - auth
-      summary: Submit the code
-      description: If code is valid user will be created (if not exists)
+      summary: Отправить проверочный код
+      description: Если код верен, то пользователь будет создан (если еще не существует).
       operationId: authCheckCode
       requestBody:
         content:
@@ -64,7 +66,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful check
+          description: Успешная проверка
           content:
             application/json:
               schema:
@@ -73,13 +75,13 @@ paths:
                   - $ref: '#/components/schemas/authCheckCodeResponseNotVerified'
               examples:
                 success:
-                  summary: Code is verified
+                  summary: Код подтвержден
                   value:
                     status: "ok"
                     is_verified: true
                     auth_token: "eyJhbGciOiJIUzI1NiIIInR5cCI6IkpXVCJ9.eyJpZCI6NywiZXhwIjoyMQM4NDIxMTY6fQ.oPmyN0ctSVWGZySvB5ZLfLeJr7maHvBlKY6XuaZBijw"
                 error:
-                  summary: Code is not verified
+                  summary: Код не подтвержден
                   value:
                     status: "ok"
                     is_verified: false
@@ -89,8 +91,7 @@ paths:
     get:
       tags:
         - stations
-      summary: Get all stations with all data
-      description: Get all stations with all data
+      summary: Получить все станции со всеми данными
       responses:
         '200':
           description: Successful
@@ -104,7 +105,7 @@ paths:
     post:
       tags:
         - orders
-      summary: Take umbrella
+      summary: Взять зонт
       security: 
         - Bearer: []
       requestBody:
@@ -115,7 +116,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Returned payment method
+          description: В ответ возвращается способ оплаты
           content:
             application/json:
               schema:
@@ -124,7 +125,7 @@ paths:
                   - $ref: '#/components/schemas/takeUmbrellaResponseError'
               examples:
                 success:
-                  summary: Deposit is taken / manual is required
+                  summary: Депозит внесен автоматически / требуется ручная оплата
                   value:
                     status: "ok"
                     payment_mode: "auto"
@@ -132,7 +133,7 @@ paths:
                     user_id: 1234
                     station_id: 23
                 error:
-                  summary: The deposit cannot be taken
+                  summary: Депозит не может быть взят
                   value:
                     status: "error"
                     message: "You have an active order"
@@ -141,7 +142,7 @@ paths:
     post:
       tags:
         - orders
-      summary: Put umbrella
+      summary: Вернуть зонт
       security: 
         - Bearer: []
       requestBody:
@@ -152,7 +153,6 @@ paths:
         required: true
       responses:
         '200':
-          description: Returned payment method
           content:
             application/json:
               schema:
@@ -161,7 +161,7 @@ paths:
                   - $ref: '#/components/schemas/takeUmbrellaResponseError'
               examples:
                 success:
-                  summary: The umbrella return slot is open
+                  summary: Ячейка для возврата зонта открыта
                   value:
                     status: "ok"
                     slot: 8
@@ -176,13 +176,13 @@ paths:
     get:
       tags:
         - orders
-      summary: Get current order status
-      description: Returns the status of the user's current order
+      summary: Получить текущий статус заказа
+      description: Возвращает статус текущего заказа пользователя
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -191,13 +191,13 @@ paths:
                   - $ref: '#/components/schemas/getOrderStatusResponseOtherActions'
               examples:
                 success:
-                  summary: Station opened
+                  summary: Станция открыта
                   value:
                     status: "ok"
                     order_status: "station_opened_to_take"
                     slot: 8
                 success2:
-                  summary: Other statuses
+                  summary: Другие статусы
                   value:
                     status: "ok"
                     order_status: "closed_successfully"
@@ -206,8 +206,8 @@ paths:
     post:
       tags:
         - orders
-      summary: Leave a feedback
-      description: Leave a feedback for the last order
+      summary: Оставить отзыв
+      description: Оставить отзыв о последнем заказе
       security: 
         - Bearer: []
       requestBody:
@@ -218,7 +218,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -228,12 +228,12 @@ paths:
     get:
       tags:
         - profile
-      summary: Get user info
+      summary: Получить информацию о пользователе
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -243,7 +243,7 @@ paths:
     post:
       tags:
         - profile
-      summary: Update user info
+      summary: Обновить информацию о пользователе
       security: 
         - Bearer: []
       requestBody: 
@@ -254,7 +254,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -264,12 +264,12 @@ paths:
     get:
       tags:
         - profile
-      summary: Get user's active order
+      summary: Получить активный заказ пользователя
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -279,12 +279,12 @@ paths:
     get:
       tags:
         - profile
-      summary: Get all processed user orders
+      summary: Получать все закрытые заказы пользователей
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -295,12 +295,12 @@ paths:
     get:
       tags:
         - subscription
-      summary: Get user's subscription info
+      summary: Получить информацию о подписке пользователя
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -310,7 +310,7 @@ paths:
     post:
       tags:
         - subscription
-      summary: Send an invitation to family
+      summary: Отправить приглашение в семью
       security: 
         - Bearer: []
       requestBody:
@@ -321,7 +321,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -330,9 +330,9 @@ paths:
                   - $ref: '#/components/schemas/subscriptionSendInvitationToFamilyResponseError'
               examples:
                 success:
-                  summary: Success
+                  summary: Приглашение отправлено
                 error:
-                  summary: Error
+                  summary: Ошибка
                   value:
                     status: "error"
                     code: "user_not_found"
@@ -342,12 +342,12 @@ paths:
     get:
       tags:
         - subscription
-      summary: Get invitations from different people to a specific subscription
+      summary: Получить приглашения разных людей в конкретную подписку
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -357,12 +357,12 @@ paths:
     get:
       tags:
         - subscription
-      summary: Get invitations from all subscriptions to specific user
+      summary: Получить приглашения текущего пользователя во все подписки
       security: 
         - Bearer: []
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -372,7 +372,7 @@ paths:
     post:
       tags:
         - subscription
-      summary: Accept invitation to the family
+      summary: Принять приглашение в семью
       security: 
         - Bearer: []
       requestBody:
@@ -383,7 +383,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -393,7 +393,7 @@ paths:
     post:
       tags:
         - subscription
-      summary: Reject invitation to the family
+      summary: Отклонить приглашение в семью
       security: 
         - Bearer: []
       requestBody:
@@ -404,7 +404,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
@@ -414,7 +414,7 @@ paths:
     post:
       tags:
         - subscription
-      summary: Delete invitation to the family by subscription owner
+      summary: Удалить приглашение в семью от владельца подписки
       security: 
         - Bearer: []
       requestBody:
@@ -425,12 +425,50 @@ paths:
         required: true
       responses:
         '200':
-          description: Successful
+          description: Успешно
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/standartOKSchema'
 
+
+  /landing-forms/support:
+    post:
+      tags:
+        - landing-forms
+      summary: Отправить сообщение в службу поддержки
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/supportRequest'
+        required: true
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/standartOKSchema'
+  
+  /landing-forms/install-station-request:
+    post:
+      tags:
+        - landing-forms
+      summary: Запрос на установку станции
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/installStationRequest'
+        required: true
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/standartOKSchema'
 
 
 
@@ -449,7 +487,7 @@ components:
       properties:
         phone:
           type: string
-          description: Spaces, dashes, and parentheses can be used. Be sure to use +7
+          description: Можно использовать пробелы, тире и круглые скобки. Обязательно используйте +7
           example: '+7 (800) 555-35-35'
     
     standartOKSchema:
@@ -467,7 +505,7 @@ components:
       properties:
         phone:
           type: string
-          description: Spaces, dashes, and parentheses can be used. Be sure to use +7
+          description: Можно использовать пробелы, тире и круглые скобки. Обязательно используйте +7
           example: '+7 (800) 555-35-35'
         code:
           type: string
@@ -528,7 +566,7 @@ components:
             properties:
               mon:
                 type: object
-                description: may be mon/tue/wed/thu/fri/sat/sun
+                description: может быть mon/tue/wed/thu/fri/sat/sun
                 properties: 
                   start:
                     type: string
@@ -544,7 +582,7 @@ components:
                     example: "14:00"
               tue:
                 type: object
-                description: may be mon/tue/wed/thu/fri/sat/sun
+                description: может быть mon/tue/wed/thu/fri/sat/sun
                 properties: 
                   start:
                     type: string
@@ -556,25 +594,25 @@ components:
                 type: string
                 example: null
         capacity:
-          description: How many umbrellas can fit in the station at all
+          description: Сколько зонтиков вообще может поместиться в станции
           type: integer
           example: 20
         can_put:
-          description: How many umbrellas can fit in the station now
+          description: Сколько зонтиков сейчас может поместиться в станции
           type: integer
           example: 6
         can_take:
-          description: How many umbrellas are there in the station now
+          description: Сколько сейчас зонтиков в станции
           type: integer
           example: 14
         information:
-          description: Additional information how to find the station
+          description: Дополнительная информация о том, как найти станцию
           type: string
           example: "Пойдите туда, не знаю куда"
         state:
           description: |-
-            `0` - works fine \
-            `1` - does not work
+            `0` - работает отлично \
+            `1` - не работает
           type: integer
           example: 0
     
@@ -599,8 +637,8 @@ components:
           enum: ["ok"]
         payment_mode:
           description: |- 
-            `auto` - the deposit is automatically debited \
-            `manual` - a manual deposit is required
+            `auto` - депозит списан автоматически \
+            `manual` - необходимо внести депозит вручную
           type: string
           enum: ["auto", "manual"]
         deposit_amount:
@@ -631,7 +669,7 @@ components:
           type: string
           enum: ["ok"]
         slot:
-          description: The slot that will open to return the umbrella
+          description: Ячейка, которая откроется для возврата зонта
           type: integer
           example: 8
         order_id:
@@ -647,8 +685,8 @@ components:
           enum: ["ok"]
         order_status:
           description: |-
-            * `station_opened_to_take` - the slot is open for taking an umbrella
-            * `station_opened_to_put` - the slot is open to return the umbrella
+            * `station_opened_to_take` - ячейка открыта для взятия зонта
+            * `station_opened_to_put` - ячейка открыта для возврата зонт
           type: integer
           enum: ["station_opened_to_take", "station_opened_to_put"]
         slot:
@@ -663,11 +701,11 @@ components:
           enum: ["ok"]
         order_status:
           description: |-
-            * `in_the_hands` - the umbrella has been taken and is in the user's possession
-            * `closed_successfully` - the umbrella is returned, the order is closed
-            * `timeout_exceeded` - the waiting time for taking the umbrella has expired
-            * `bank_error` - bank error, payment failed
-            * `unknown` - something went wrong
+            * `in_the_hands` - зонт взят и находится в распоряжении пользователя
+            * `closed_successfully` - зонт возвращен, заказ закрыт
+            * `timeout_exceeded` - время взятия зонта истекло
+            * `bank_error` - банковская ошибка, платеж не выполнен
+            * `unknown` - что-то пошло не так
           type: integer
           enum: ["in_the_hands", "closed_successfully", "timeout_exceeded", "bank_error", "unknown"]
     
@@ -680,7 +718,7 @@ components:
           enum: [1, 2, 3, 4, 5]
           example: 5
         text:
-          description: may be null
+          description: может быть null
           type: string
           example: "Все было круто!"
     
@@ -737,27 +775,27 @@ components:
           example: 234
         state:
           description: |-
-            Order status: \
-            `0` - the order is closed (standard) \
-            `1` - the order is open \
-            `2` - the order is closed because the user did not take the umbrella during \
-            `3` - the order is closed due to payment problems \
-            `4` - the order is closed due to an internal error (for example, there are no free umbrellas)
+            Статус заказа: \
+            `0` - заказ закрыт (обычным способом) \
+            `1` - заказ открыт \
+            `2` - заказ закрыт, потому что пользователь не взял зонт вовремя \
+            `3` - заказ закрыт из-за проблем с оплатой \
+            `4` - заказ закрыт из-за внутренней ошибки (например, нет свободных зонтиков)
           type: integer
         datetime_take:
-          description: Date and time of taking the umbrella
+          description: Дата и время взятия зонта
           type: string
           example: "2024-07-19 12:14:23.684691+03"
         station_take:
-          description: ID of the station from which the umbrella was taken
+          description: ID станции, из которой был взят зонт
           type: integer
           example: 23
         slot_take:
-          description: The slot number at the station where the umbrella was taken from
+          description: Номер ячейки на станции, откуда был взят зонт
           type: integer
           example: 4
         deposit_tx_id:
-          description: ID of the transaction in which the deposit was made
+          description: ID транзакции, в ходе которой был внесен депозит
           type: string
           example: "2482965031"
 
@@ -769,43 +807,43 @@ components:
           example: 234
         state:
           description: |-
-            Order status: \
-            `0` - the order is closed (standard) \
-            `1` - the order is open \
-            `2` - the order is closed because the user did not take the umbrella during \
-            `3` - the order is closed due to payment problems \
-            `4` - the order is closed due to an internal error (for example, there are no free umbrellas)
+            Статус заказа: \
+            `0` - заказ закрыт (обычным способом) \
+            `1` - заказ открыт \
+            `2` - заказ закрыт, потому что пользователь не взял зонт вовремя \
+            `3` - заказ закрыт из-за проблем с оплатой \
+            `4` - заказ закрыт из-за внутренней ошибки (например, нет свободных зонтиков)
           type: integer
         datetime_take:
-          description: Date and time of taking the umbrella
+          description: Дата и время взятия зонта
           type: string
           example: "2024-07-19 12:14:23.684691+03"
         datetime_put:
-          description: Date and time of umbrella return
+          description: Дата и время возврата зонта
           type: string
           example: "2024-07-19 18:15:20.684691+03"
         station_take:
-          description: ID of the station from which the umbrella was taken
+          description: ID станции, из которой был взят зонт
           type: integer
           example: 23
         station_put:
-          description: ID of the station where the umbrella was placed
+          description: ID станции, в которую зонт был возвращен
           type: integer
           example: 24
         slot_take:
-          description: The slot number at the station where the umbrella was taken from
+          description: Номер ячейки на станции, откуда был взят зонт
           type: integer
           example: 4
         slot_put:
-          description: The number of the slot at the station where the umbrella was placed
+          description: Номер ячейки на станции, куда зонт был возвращен
           type: integer
           example: 9
         station_take_address:
-          description: The address of the station where the umbrella was taken from
+          description: Адрес станции, откуда был взят зонт
           type: string
           example: "Москва, ул. Пушкина, дом Колотушкина"
         station_put_address:
-          description: The address of the station where the umbrella was returned
+          description: Адрес станции, куда был возвращен зонт
           type: string
           example: "Москва, ул. Пушкина, дом 44"
 
@@ -840,39 +878,39 @@ components:
           enum: ["ok", "error"]
         subscription:
           type: object
-          description: May be None if user has never had a subscription
+          description: Может отсутствовать, если у пользователя никогда не было подписки (или она закончилась, а потом пользователь вошел и вышел из семьи)
           properties:
             owner:
               type: integer
               example: 111
-              description: ID of the person who pays for the subscription
+              description: ID пользователя, оплачивающего подписку (владелец)
             family_members:
-              description: Family members. Owner's ID should always be in the list
+              description: Члены семьи. Идентификатор владельца всегда должен быть в списке
               type: array
               items:
                 properties:
                   id: 
                     type: integer
                     example: 222
-                    description: ID of the family member
+                    description: ID члена семьи
                   phone:
                     type: string
                     example: "+78005553535"
-                    description: Phone number of the family member
+                    description: Номер телефона члена семьи
                   name:
                     type: string
                     example: "Марина"
-                    description: Name of the family member
+                    description: Имя члена семьи
             until:
               type: string
               example: "2024-07-19 18:15:20.684691+03"
-              description: The date and time until which the subscription is valid
+              description: Дата и время, до которых действует подписка
             is_active:
               type: boolean
               example: true
               description: |-
-                `true` - the subscription is active \
-                `false` - the subscription is not active
+                `true` - подписка активна \
+                `false` - подписка неактивна
     
 
     subscriptionSendInvitationToFamilyRequest:
@@ -881,7 +919,7 @@ components:
         phone:
           type: string
           example: "+78125730128"
-          description: May include spaces and parentheses (but not desirable)
+          description: Может содержать пробелы и круглые скобки (но нежелательно)
 
     subscriptionSendInvitationToFamilyResponseError: 
       type: object
@@ -949,7 +987,7 @@ components:
                   phone:
                     type: string
                     example: "+12024561111"
-                    description: This is an example, in reality we will not have foreign numbers
+                    description: Это только пример, на самом деле у нас не будет иностранных номеров
                   name:
                     type: string
                     example: "Дональд"
@@ -963,5 +1001,46 @@ components:
         invitation_id:
           type: integer
           example: 1234
+    
 
+    supportRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Иван"
+        city:
+          type: string
+          example: "Москва"
+        email:
+          type: string
+          example: "ivan@yandex.ru"
+        phone:
+          type: string
+          example: "+78005553535"
+        text:
+          type: string
+          example: "Привет, я хочу узнать, как взять зонтик? (да, я не умею читать)"
+
+    installStationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Иван"
+        organization:
+          type: string
+          example: "ООО Рога и копыта"
+        city:
+          type: string
+          example: "Москва"
+        email:
+          type: string
+          example: "ivan@yandex.ru"
+        phone:
+          type: string
+          example: "+78005553535"
+        text:
+          type: string
+          example: "Привет, я хочу установить станцию у себя в офисе"
 
