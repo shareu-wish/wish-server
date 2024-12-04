@@ -5,6 +5,7 @@ import phone_verification
 import config
 import jwt
 import datetime
+from api.v1 import check_auth
 
 
 @api.route("/auth/start-phone-verification", methods=["POST"])
@@ -49,3 +50,13 @@ def auth_check_code():
         return {"status": "ok", "is_verified": False, "reason": "timeout_exceeded"}
 
 # TODO: VK auth API
+
+
+@api.route("/auth/check")
+def auth_check():
+    """
+    Проверить авторизацию пользователя
+    """
+
+    return {"status": "ok", "user_id": check_auth()}
+

@@ -87,6 +87,23 @@ paths:
                     is_verified: false
                     reason: "timeout_exceeded"
 
+  /auth/check:
+    get:
+      tags:
+        - auth
+      summary: Проверить авторизацию
+      description: Проверить, авторизован ли пользователь. При положительном результате возвращает ID этого пользователя
+      security: 
+        - Bearer: []
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/checkAuthResponse'
+
+
   /stations/get-all-stations:
     get:
       tags:
@@ -224,6 +241,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/standartOKSchema'
 
+  /orders/get-active-order:
+    get:
+      tags:
+        - orders
+      summary: Получить активный заказ пользователя
+      security: 
+        - Bearer: []
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getActiveOrderResponse'
+  
+  /orders/get-processed-orders:
+    get:
+      tags:
+        - orders
+      summary: Получать все закрытые заказы пользователей
+      security: 
+        - Bearer: []
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getProcessedOrdersResponse'
+
+
   /profile/get-user-info:
     get:
       tags:
@@ -259,36 +307,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/standartOKSchema'
-
-  /profile/get-active-order:
-    get:
-      tags:
-        - profile
-      summary: Получить активный заказ пользователя
-      security: 
-        - Bearer: []
-      responses:
-        '200':
-          description: Успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/profileGetActiveOrderResponse'
-  
-  /profile/get-processed-orders:
-    get:
-      tags:
-        - profile
-      summary: Получать все закрытые заказы пользователей
-      security: 
-        - Bearer: []
-      responses:
-        '200':
-          description: Успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/profileGetProcessedOrdersResponse'
 
 
   /subscription/get-subscription-info:
@@ -472,6 +490,11 @@ paths:
 
 
 
+
+
+
+
+
 components:
   securitySchemes:
     Bearer:
@@ -540,6 +563,16 @@ components:
             - "timeout_exceeded"
             - null
     
+    checkAuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["ok"]
+        user_id:
+          type: integer
+          example: 123
+
 
     stationObject:
       type: object
@@ -848,7 +881,7 @@ components:
           example: "Москва, ул. Пушкина, дом 44"
 
 
-    profileGetActiveOrderResponse: 
+    getActiveOrderResponse: 
       type: object
       properties: 
         status:

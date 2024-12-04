@@ -31,33 +31,3 @@ def profile_update_user_info():
     db_helper.user.update_user_info(user_id, data)
     
     return {"status": "ok"}
-
-
-@api.route("/profile/get-active-order")
-def profile_get_active_order():
-    user_id = check_auth()
-    if not user_id:
-        return {"status": "error", "order": None}
-
-    order = db_helper.orders.get_active_order(user_id)
-    if not order:
-        return {"status": "ok", "order": None}
-
-    return {"status": "ok", "order": order}
-
-
-@api.route("/profile/get-processed-orders")
-def profile_get_processed_orders():
-    user_id = check_auth()
-    if not user_id:
-        return {"status": "error", "orders": []}
-
-    orders = db_helper.orders.get_processed_orders(user_id)
-    if not orders:
-        return {"status": "ok", "orders": []}
-    
-    for i in range(len(orders)):
-        orders[i]['station_take_address'] = db_helper.stations.get_station(orders[i]['station_take'])['address']
-        orders[i]['station_put_address'] = db_helper.stations.get_station(orders[i]['station_put'])['address']
-
-    return {"status": "ok", "orders": orders}

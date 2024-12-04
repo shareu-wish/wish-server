@@ -163,6 +163,7 @@ def _schedule_check_for_delays() -> None:
     Timer(60*5, _schedule_check_for_delays).start()
 
 
-# if not config.DEBUG:
-_schedule_check_for_delays()
+
+if not config.DEBUG:
+    _schedule_check_for_delays()
 
