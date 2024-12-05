@@ -9,7 +9,7 @@ def get_stations() -> list[dict]:
     """
 
     cur = conn.cursor()
-    cur.execute("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, picture, information, state FROM stations")
+    cur.execute("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, information, state FROM stations")
     data = cur.fetchall()
     cur.close()
 
@@ -25,9 +25,8 @@ def get_stations() -> list[dict]:
             "capacity": station[6],
             "can_put": station[7],
             "can_take": station[8],
-            "picture": station[9],
-            "information": station[10],
-            "state": station[11]
+            "information": station[9],
+            "state": station[10]
         })
 
     return res
@@ -41,7 +40,7 @@ def get_station(id: int) -> dict:
     """
 
     cur = conn.cursor()
-    cur.execute("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, picture, information, state FROM stations WHERE id = %s", (id,))
+    cur.execute("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, information, state FROM stations WHERE id = %s", (id,))
     data = cur.fetchone()
     cur.close()
 
@@ -55,9 +54,8 @@ def get_station(id: int) -> dict:
         "capacity": data[6],
         "can_put": data[7],
         "can_take": data[8],
-        "picture": data[9],
-        "information": data[10],
-        "state": data[11]
+        "information": data[9],
+        "state": data[10]
     }
 
     return res
