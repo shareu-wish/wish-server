@@ -103,6 +103,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/checkAuthResponse'
 
+  /auth/vk-id:
+    post:
+      tags:
+        - auth
+      summary: Войти через VK ID
+      description: Принимает `access_token`, полученный при авторизации через VK ID. Сохраняет данные пользователя (имя, пол, возраст) в БД и возвращает токен авторизации WISH
+      security: 
+        - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/authVKIDRequest'
+        required: true
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authVKIDResponse'
+
 
   /stations/get-all-stations:
     get:
@@ -170,6 +192,7 @@ paths:
         required: true
       responses:
         '200':
+          description: Результат возврата зонта
           content:
             application/json:
               schema:
@@ -260,7 +283,7 @@ paths:
     get:
       tags:
         - orders
-      summary: Получать все закрытые заказы пользователей
+      summary: Получить все закрытые заказы пользователя
       security: 
         - Bearer: []
       responses:
@@ -562,6 +585,23 @@ components:
             - "attempts_exceeded"
             - "timeout_exceeded"
             - null
+
+    authVKIDRequest:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    
+    authVKIDResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["ok"]
+        auth_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIIInR5cCI6IkpXVCJ9.eyJpZCI6NywiZXhwIjoyMQM4NDIxMTY6fQ.oPmyN0ctSVWGZySvB5ZLfLeJr7maHvBlKY6XuaZBijw"
     
     checkAuthResponse:
       type: object
@@ -891,7 +931,7 @@ components:
           $ref: '#/components/schemas/activeOrderObject'
     
 
-    profileGetProcessedOrdersResponse: 
+    getProcessedOrdersResponse: 
       type: object
       properties: 
         status:

@@ -6,6 +6,7 @@ import random
 CLIENT_ID = config.VK_ID_CLIENT_ID
 
 
+# Эта функция не нужна, реализована в webapp
 def exchange_code_for_tokens(code, state, device_id, code_verifier):
     """
     Метод позволяет получить `access_token`, `refresh_token` и `id_token` из `authorization_code`, 
