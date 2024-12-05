@@ -1,6 +1,5 @@
 from flask import Flask, send_from_directory
 import config
-from waitress import serve
 from api.v1 import api as api_v1
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -37,4 +36,5 @@ if __name__ == "__main__":
     if config.DEBUG:
         app.run(port=5050, debug=True, host=config.DEBUG_HOST, use_reloader=False)
     else:
-        serve(app, host="0.0.0.0", port=5050, url_scheme="https", threads=100)
+        app.run(port=config.PORT, host=config.HOST)
+        # serve(app, host=config.HOST, port=config.PORT, url_scheme="https", threads=100)
