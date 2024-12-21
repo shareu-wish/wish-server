@@ -1,4 +1,4 @@
-from db_helper import conn
+from . import _db_cmd as db_cmd
 
 
 def get_stations() -> list[dict]:
@@ -8,10 +8,7 @@ def get_stations() -> list[dict]:
     :return: Список станций
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, information, state FROM stations")
-    data = cur.fetchall()
-    cur.close()
+    data = db_cmd.fetchall("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, information, state FROM stations")
 
     res = []
     for station in data:
@@ -39,10 +36,7 @@ def get_station(id: int) -> dict:
     :param id: ID станции
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, information, state FROM stations WHERE id = %s", (id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, title, address, latitude, longitude, opening_hours, capacity, can_put, can_take, information, state FROM stations WHERE id = %s", (id,))
 
     res = {
         "id": data[0],
@@ -69,11 +63,8 @@ def decrease_free_umbrellas_on_station(station_id: int) -> None:
     """
     
     print("decrease_free_umbrellas_on_station")
-    cur = conn.cursor()
-    cur.execute("UPDATE stations SET can_take = can_take - 1 WHERE id = %s", (station_id,))
-    cur.execute("UPDATE stations SET can_put = can_put + 1 WHERE id = %s", (station_id,))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE stations SET can_take = can_take - 1 WHERE id = %s", (station_id,))
+    db_cmd.commit("UPDATE stations SET can_put = can_put + 1 WHERE id = %s", (station_id,))
 
 
 def increase_free_umbrellas_on_station(station_id: int) -> None:
@@ -84,8 +75,6 @@ def increase_free_umbrellas_on_station(station_id: int) -> None:
     """
 
     print("increase_free_umbrellas_on_station")
-    cur = conn.cursor()
-    cur.execute("UPDATE stations SET can_take = can_take + 1 WHERE id = %s", (station_id,))
-    cur.execute("UPDATE stations SET can_put = can_put - 1 WHERE id = %s", (station_id,))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE stations SET can_take = can_take + 1 WHERE id = %s", (station_id,))
+    db_cmd.commit("UPDATE stations SET can_put = can_put - 1 WHERE id = %s", (station_id,))
+

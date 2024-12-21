@@ -1,4 +1,4 @@
-from db_helper import conn
+from . import _db_cmd as db_cmd
 
 
 def create_support_request(name: str, city: str, email: str, phone: str, text: str) -> None:
@@ -12,10 +12,7 @@ def create_support_request(name: str, city: str, email: str, phone: str, text: s
     :param text: Текст обращения
     """
 
-    cur = conn.cursor()
-    cur.execute("INSERT INTO support (name, city, email, phone, text) VALUES (%s, %s, %s, %s, %s)", (name, city, email, phone, text))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("INSERT INTO support (name, city, email, phone, text) VALUES (%s, %s, %s, %s, %s)", (name, city, email, phone, text))
 
 
 def create_install_station_request(name: str, organization: str, city: str, email: str, phone: str, text: str) -> None:
@@ -30,7 +27,4 @@ def create_install_station_request(name: str, organization: str, city: str, emai
     :param text: Комментарий
     """
 
-    cur = conn.cursor()
-    cur.execute("INSERT INTO install_station_requests (name, organization, city, email, phone, text) VALUES (%s, %s, %s, %s, %s, %s)", (name, organization, city, email, phone, text))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("INSERT INTO install_station_requests (name, organization, city, email, phone, text) VALUES (%s, %s, %s, %s, %s, %s)", (name, organization, city, email, phone, text))

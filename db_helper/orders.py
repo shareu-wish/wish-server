@@ -1,4 +1,4 @@
-from db_helper import conn
+from . import _db_cmd as db_cmd
 from datetime import datetime
 
 
@@ -12,11 +12,7 @@ def open_order(user_id: int, station_id: int, slot: int = None) -> int:
     :return: ID заказа
     """
 
-    cur = conn.cursor()
-    cur.execute("INSERT INTO orders (user_id, state, station_take, slot_take) VALUES (%s, %s, %s, %s) RETURNING id", (user_id, 1, station_id, slot))
-    order_id = cur.fetchone()[0]
-    conn.commit()
-    cur.close()
+    order_id = db_cmd.fetchone("INSERT INTO orders (user_id, state, station_take, slot_take) VALUES (%s, %s, %s, %s) RETURNING id", (user_id, 1, station_id, slot))[0]
 
     return order_id
 
@@ -35,10 +31,7 @@ def get_active_order(user_id: int) -> dict | None:
         - *deposit_tx_id*: ID транзакции, в которой был сделан депозит
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, state, datetime_take, station_take, slot_take, deposit_tx_id FROM orders WHERE user_id = %s AND state = 1", (user_id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, state, datetime_take, station_take, slot_take, deposit_tx_id FROM orders WHERE user_id = %s AND state = 1", (user_id,))
 
     if data is None:
         return None
@@ -70,10 +63,7 @@ def close_order(order_id: int, station_id: int = None, slot: int = None, state: 
         + **4** - заказ закрыт из-за внутренней ошибки (например, нет свободных зонтов)
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE orders SET state = %s, station_put = %s, slot_put = %s, datetime_put = %s WHERE id = %s", (state, station_id, slot, datetime.now(), order_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE orders SET state = %s, station_put = %s, slot_put = %s, datetime_put = %s WHERE id = %s", (state, station_id, slot, datetime.now(), order_id))
 
 
 def get_processed_orders(user_id: int) -> list[dict]:
@@ -92,10 +82,7 @@ def get_processed_orders(user_id: int) -> list[dict]:
         - *slot_put*: номер слота на станции, куда был помещен зонт
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, state, datetime_take, datetime_put, station_take, station_put, slot_take, slot_put FROM orders WHERE user_id = %s AND state = 0", (user_id, ))
-    data = cur.fetchall()
-    cur.close()
+    data = db_cmd.fetchall("SELECT id, state, datetime_take, datetime_put, station_take, station_put, slot_take, slot_put FROM orders WHERE user_id = %s AND state = 0", (user_id, ))
 
     res = []
     for order in data:
@@ -121,10 +108,7 @@ def update_order_take_slot(order_id: int, slot: int) -> None:
     :param slot: номер слота на станции, куда был помещен зонт
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE orders SET slot_take = %s WHERE id = %s", (slot, order_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE orders SET slot_take = %s WHERE id = %s", (slot, order_id))
 
 
 def set_order_deposit_tx_id(order_id: int, tx_id: str) -> None:
@@ -135,10 +119,7 @@ def set_order_deposit_tx_id(order_id: int, tx_id: str) -> None:
     :param tx_id: ID транзакции, в которой был сделан депозит
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE orders SET deposit_tx_id = %s WHERE id = %s", (tx_id, order_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE orders SET deposit_tx_id = %s WHERE id = %s", (tx_id, order_id))
 
 
 def get_last_order(user_id: int) -> dict | None:
@@ -157,10 +138,7 @@ def get_last_order(user_id: int) -> dict | None:
         - *slot_put*: номер слота на станции, куда был помещен зонт
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, state, datetime_take, datetime_put, station_take, station_put, slot_take, slot_put FROM orders WHERE user_id = %s ORDER BY id DESC LIMIT 1", (user_id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, state, datetime_take, datetime_put, station_take, station_put, slot_take, slot_put FROM orders WHERE user_id = %s ORDER BY id DESC LIMIT 1", (user_id,))
 
     if data is None:
         return None
@@ -193,10 +171,7 @@ def get_order(order_id: int) -> dict | None:
         - *deposit_tx_id*: ID транзакции, в которой был сделан депозит
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, user_id, state, datetime_take, station_take, slot_take, deposit_tx_id FROM orders WHERE id = %s", (order_id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, user_id, state, datetime_take, station_take, slot_take, deposit_tx_id FROM orders WHERE id = %s", (order_id,))
 
     if data is None:
         return None

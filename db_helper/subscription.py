@@ -1,4 +1,4 @@
-from db_helper import conn
+from . import _db_cmd as db_cmd
 from datetime import datetime
 import datetime as dt
 
@@ -16,11 +16,7 @@ def get_user_subscription(user_id: int) -> dict | None:
         - *is_active*: Действует ли сейчас подписка
     """
 
-    cur = conn.cursor()
-    # Find subscription where user_id in family_members array
-    cur.execute("SELECT id, owner, family_members, until FROM subscriptions WHERE %s = ANY(family_members)", (user_id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, owner, family_members, until FROM subscriptions WHERE %s = ANY(family_members)", (user_id,))
 
     if data is None:
         return None
@@ -48,10 +44,7 @@ def get_subscription(subscription_id: int) -> dict | None:
         - *is_active*: Действует ли сейчас подписка
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT owner, family_members, until FROM subscriptions WHERE id = %s", (subscription_id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT owner, family_members, until FROM subscriptions WHERE id = %s", (subscription_id,))
 
     if data is None:
         return None
@@ -75,19 +68,10 @@ def create_subscription_invitation(user_id: int, recipient_id: int) -> None:
     """
 
     # get subscription_id by user_id
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM subscriptions WHERE owner = %s", (user_id,))
-    data = cur.fetchone()
-    cur.close()
-    if data is None:
-        return
-    subscription_id = data[0]
+    subscription_id = db_cmd.fetchone("SELECT id FROM subscriptions WHERE owner = %s", (user_id,))[0]
     
     # insert data in subscription_invitations
-    cur = conn.cursor()
-    cur.execute("INSERT INTO subscription_invitations (subscription_id, owner, recipient) VALUES (%s, %s, %s)", (subscription_id, user_id, recipient_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("INSERT INTO subscription_invitations (subscription_id, owner, recipient) VALUES (%s, %s, %s)", (subscription_id, user_id, recipient_id))
 
 
 def get_subscription_invitation(invitation_id: int) -> dict | None:
@@ -102,10 +86,7 @@ def get_subscription_invitation(invitation_id: int) -> dict | None:
         - *recipient*: ID пользователя, который приглашается
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, subscription_id, owner, recipient FROM subscription_invitations WHERE id = %s", (invitation_id, ))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, subscription_id, owner, recipient FROM subscription_invitations WHERE id = %s", (invitation_id, ))
 
     if data is None:
         return None
@@ -132,10 +113,7 @@ def find_user_subscription_invitations(user_id: int) -> list[dict]:
         - *recipient*: ID пользователя, который приглашается
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, subscription_id, owner, recipient FROM subscription_invitations WHERE recipient = %s", (user_id,))
-    data = cur.fetchall()
-    cur.close()
+    data = db_cmd.fetchall("SELECT id, subscription_id, owner, recipient FROM subscription_invitations WHERE recipient = %s", (user_id,))
 
     res = []
     for invitation in data:
@@ -160,10 +138,7 @@ def find_subscription_invitations_by_subscription_id(subscription_id: int) -> li
         - *recipient*: ID пользователя, который приглашается
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, owner, recipient FROM subscription_invitations WHERE subscription_id = %s", (subscription_id,))
-    data = cur.fetchall()
-    cur.close()
+    data = db_cmd.fetchall("SELECT id, owner, recipient FROM subscription_invitations WHERE subscription_id = %s", (subscription_id,))
 
     res = []
     for invitation in data:
@@ -183,10 +158,7 @@ def delete_subscription_invitation(invitation_id: int) -> None:
     :param invitation_id: ID приглашения
     """
 
-    cur = conn.cursor()
-    cur.execute("DELETE FROM subscription_invitations WHERE id = %s", (invitation_id, ))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("DELETE FROM subscription_invitations WHERE id = %s", (invitation_id, ))
 
 
 def delete_inactive_subscription(subscription_id: int) -> None:
@@ -196,10 +168,7 @@ def delete_inactive_subscription(subscription_id: int) -> None:
     :param subscription_id: ID подписки
     """
 
-    cur = conn.cursor()
-    cur.execute("DELETE FROM subscriptions WHERE id = %s AND until < %s", (subscription_id, datetime.now().astimezone(tz=dt.timezone(dt.timedelta(seconds=10800)))))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("DELETE FROM subscriptions WHERE id = %s AND until < %s", (subscription_id, datetime.now().astimezone(tz=dt.timezone(dt.timedelta(seconds=10800)))))
 
 
 def add_user_to_subscription_family(subscription_id: int, user_id: int) -> None:
@@ -210,7 +179,4 @@ def add_user_to_subscription_family(subscription_id: int, user_id: int) -> None:
     :param user_id: ID пользователя
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE subscriptions SET family_members = array_append(family_members, %s) WHERE id = %s", (user_id, subscription_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE subscriptions SET family_members = array_append(family_members, %s) WHERE id = %s", (user_id, subscription_id))
