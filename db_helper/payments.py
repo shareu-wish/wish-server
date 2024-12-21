@@ -1,4 +1,4 @@
-from db_helper import conn
+from . import _db_cmd as db_cmd
 from datetime import datetime
 
 
@@ -10,10 +10,7 @@ def get_user_payment_token(user_id: int) -> str | None:
     :return: Токен оплаты
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT payment_token FROM users WHERE id = %s", (user_id, ))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT payment_token FROM users WHERE id = %s", (user_id, ))
 
     if data is None:
         return None
@@ -35,10 +32,7 @@ def get_orders_with_delays() -> list[dict]:
         - *payments_for_delay_number*: Количество списаний за задержку
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, user_id, state, deposit_tx_id, datetime_take, datetime_last_payment, payments_for_delay_number FROM orders WHERE state = 1 AND datetime_last_payment < %s - INTERVAL '1 day' AND payments_for_delay_number < 3", (datetime.now(),))
-    data = cur.fetchall()
-    cur.close()
+    data = db_cmd.fetchall("SELECT id, user_id, state, deposit_tx_id, datetime_take, datetime_last_payment, payments_for_delay_number FROM orders WHERE state = 1 AND datetime_last_payment < %s - INTERVAL '1 day' AND payments_for_delay_number < 3", (datetime.now(),))
 
     res = []
     for order in data:
@@ -62,7 +56,4 @@ def set_order_delay_paid(order_id: int) -> None:
     :param order_id: ID заказа
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE orders SET payments_for_delay_number = payments_for_delay_number + 1, datetime_last_payment = %s WHERE id = %s", (datetime.now(), order_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE orders SET payments_for_delay_number = payments_for_delay_number + 1, datetime_last_payment = %s WHERE id = %s", (datetime.now(), order_id))

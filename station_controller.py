@@ -164,7 +164,7 @@ _monitor_take_umbrella_timeout()
 
 
 if __name__ == "__main__":
-    # _init_station(2, 20)
+    # _init_station(2, 10)
 
     mqttc.loop_forever()
 else:

@@ -109,8 +109,6 @@ paths:
         - auth
       summary: Войти через VK ID
       description: Принимает `access_token`, полученный при авторизации через VK ID. Сохраняет данные пользователя (имя, пол, возраст) в БД и возвращает токен авторизации WISH
-      security: 
-        - Bearer: []
       requestBody:
         content:
           application/json:

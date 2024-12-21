@@ -1,4 +1,4 @@
-from db_helper import conn
+from . import _db_cmd as db_cmd
 
 
 def create_raw_user(phone: str) -> int:
@@ -9,15 +9,8 @@ def create_raw_user(phone: str) -> int:
     :return: ID пользователя
     """
 
-    cur = conn.cursor()
-    cur.execute("INSERT INTO users (phone) VALUES (%s)", (phone,))
-    conn.commit()
-    cur.close()
-
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM users WHERE phone = %s", (phone,))
-    user_id = cur.fetchone()[0]
-    cur.close()
+    db_cmd.commit("INSERT INTO users (phone) VALUES (%s)", (phone,))
+    user_id = db_cmd.fetchone("SELECT id FROM users WHERE phone = %s", (phone,))[0]
 
     return user_id
 
@@ -36,10 +29,7 @@ def get_user(id: int) -> dict:
         - *payment_card_last_four*: Последние 4 цифры платежной карты
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, phone, name, gender, age, payment_card_last_four FROM users WHERE id = %s", (id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, phone, name, gender, age, payment_card_last_four FROM users WHERE id = %s", (id,))
 
     res = {
         "id": data[0],
@@ -67,10 +57,7 @@ def get_user_by_phone(phone: str) -> dict | None:
         - *payment_card_last_four*: Последние 4 цифры платежной карты
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT id, phone, name, gender, age, payment_card_last_four FROM users WHERE phone = %s", (phone, ))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT id, phone, name, gender, age, payment_card_last_four FROM users WHERE phone = %s", (phone,))
 
     if data is None:
         return None
@@ -95,10 +82,7 @@ def update_user_info(id: int, data: dict) -> None:
     :param data: Данные пользователя (name, gender, age)
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET name = %s, gender = %s, age = %s WHERE id = %s", (data["name"], data["gender"], data["age"], id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE users SET name = %s, gender = %s, age = %s WHERE id = %s", (data["name"], data["gender"], data["age"], id))
 
 
 def get_user_payment_token(id: int) -> str:
@@ -109,10 +93,7 @@ def get_user_payment_token(id: int) -> str:
     :return: Токен платежа
     """
 
-    cur = conn.cursor()
-    cur.execute("SELECT payment_token FROM users WHERE id = %s", (id,))
-    data = cur.fetchone()
-    cur.close()
+    data = db_cmd.fetchone("SELECT payment_token FROM users WHERE id = %s", (id,))
 
     return data[0]
 
@@ -125,10 +106,7 @@ def update_user_payment_token(user_id: int, token: str) -> None:
     :param token: Токен платежа
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET payment_token = %s WHERE id = %s", (token, user_id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE users SET payment_token = %s WHERE id = %s", (token, user_id))
 
 
 def update_user_payment_card_last_four(id: int, last_four: str) -> None:
@@ -139,7 +117,4 @@ def update_user_payment_card_last_four(id: int, last_four: str) -> None:
     :param last_four: Последние 4 цифры платежной карты
     """
 
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET payment_card_last_four = %s WHERE id = %s", (last_four, id))
-    conn.commit()
-    cur.close()
+    db_cmd.commit("UPDATE users SET payment_card_last_four = %s WHERE id = %s", (last_four, id))
